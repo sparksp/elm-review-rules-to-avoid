@@ -46,7 +46,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Elm Publish
-        uses: dillonkearns/elm-publish-action@master
+        uses: dillonkearns/elm-publish-action@v1
         with:
           # Token provided by GitHub
           github-token: ${{ secrets.GITHUB_TOKEN }}
