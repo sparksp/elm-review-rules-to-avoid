@@ -5,7 +5,7 @@ Provides some elm-analyse rules for [`elm-review`](https://package.elm-lang.org/
 
 ## Provided rules
 
-- [`NoSingleFieldRecord`](https://package.elm-lang.org/packages/sparksp/elm-review-rules-to-avoid/1.0.0/NoSingleFieldRecord) - Reports records containing a single field.
+- [`NoSingleFieldRecord`](https://elm-doc-preview.netlify.app/NoSingleFieldRecord?repo=sparksp/elm-review-rules-to-avoid) - Reports records containing a single field.
 
 
 ## Configuration
