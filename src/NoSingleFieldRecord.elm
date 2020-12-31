@@ -7,7 +7,8 @@ module NoSingleFieldRecord exposing (rule)
 -}
 
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
-import Elm.Syntax.Node as Node exposing (Node)
+import Elm.Syntax.Node as Node exposing (Node(..))
+import Elm.Syntax.Signature exposing (Signature)
 import Elm.Syntax.TypeAnnotation as TypeAnnotation exposing (TypeAnnotation)
 import Review.Rule as Rule exposing (Rule)
 
@@ -23,6 +24,10 @@ import Review.Rule as Rule exposing (Rule)
 
     type alias SingleFieldRecord =
         { foo : String }
+
+    singleFieldRecord : String -> { foo : String }
+    singleFieldRecord foo =
+        { foo = foo }
 
 
 ## Success
@@ -65,6 +70,19 @@ declarationVisitor node =
         Declaration.AliasDeclaration { typeAnnotation } ->
             errorsForTypeAnnotation typeAnnotation
 
+        Declaration.FunctionDeclaration { signature } ->
+            errorsForFunctionSignature signature
+
+        _ ->
+            []
+
+
+errorsForFunctionSignature : Maybe (Node Signature) -> List (Rule.Error {})
+errorsForFunctionSignature signature =
+    case signature of
+        Just (Node _ { typeAnnotation }) ->
+            errorsForTypeAnnotation typeAnnotation
+
         _ ->
             []
 
@@ -79,6 +97,10 @@ errorsForTypeAnnotation typeAnnotation =
                 }
                 (Node.range typeAnnotation)
             ]
+
+        TypeAnnotation.FunctionTypeAnnotation left right ->
+            errorsForTypeAnnotation left
+                ++ errorsForTypeAnnotation right
 
         _ ->
             []
