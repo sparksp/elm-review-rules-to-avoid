@@ -30,6 +30,28 @@ type alias MultipleFieldRecord = { foo : String, bar : Int }
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should report a type alias generic record containing only 1 field" <|
+            \() ->
+                """
+module A exposing (..)
+type alias SingleFieldRecord = { r | foo : String }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "Record has only one field"
+                            , details = [ "You should use the field's type or introduce a custom Type." ]
+                            , under = "{ r | foo : String }"
+                            }
+                        ]
+        , test "does not report type alias generic records with more than one field" <|
+            \() ->
+                """
+module A exposing (..)
+type alias MultipleFieldRecord = { r | foo : String, bar : Int }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         , test "should report an argument record containing only 1 field" <|
             \() ->
                 """
@@ -44,6 +66,22 @@ singleFieldRecord { foo } =
                             { message = "Record has only one field"
                             , details = [ "You should use the field's type or introduce a custom Type." ]
                             , under = "{ foo : String }"
+                            }
+                        ]
+        , test "should report an argument generic record containing only 1 field" <|
+            \() ->
+                """
+module A exposing (..)
+singleFieldRecord : { r | foo : String } -> String
+singleFieldRecord { foo } =
+    foo
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "Record has only one field"
+                            , details = [ "You should use the field's type or introduce a custom Type." ]
+                            , under = "{ r | foo : String }"
                             }
                         ]
         , test "should report a function returning a single field record" <|
@@ -62,11 +100,37 @@ singleFieldRecord foo =
                             , under = "{ foo : String }"
                             }
                         ]
+        , test "should report a function returning a single field generic record" <|
+            \() ->
+                """
+module A exposing (..)
+singleFieldRecord : String -> { r | foo : String }
+singleFieldRecord foo =
+    { foo = foo }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "Record has only one field"
+                            , details = [ "You should use the field's type or introduce a custom Type." ]
+                            , under = "{ r | foo : String }"
+                            }
+                        ]
         , test "does not report argument records containing more than 1 field" <|
             \() ->
                 """
 module A exposing (..)
 multipleFieldRecord : { foo : String, bar : Int } -> String
+multipleFieldRecord { foo } =
+    foo
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
+        , test "does not report argument generic records containing more than 1 field" <|
+            \() ->
+                """
+module A exposing (..)
+multipleFieldRecord : { r | foo : String, bar : Int } -> String
 multipleFieldRecord { foo } =
     foo
 """

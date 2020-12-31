@@ -29,6 +29,10 @@ import Review.Rule as Rule exposing (Rule)
     singleFieldRecord foo =
         { foo = foo }
 
+    foo : { r | foo : String } -> String
+    foo r =
+        r.foo
+
 
 ## Success
 
@@ -91,6 +95,14 @@ errorsForTypeAnnotation : Node TypeAnnotation -> List (Rule.Error {})
 errorsForTypeAnnotation typeAnnotation =
     case Node.value typeAnnotation of
         TypeAnnotation.Record [ _ ] ->
+            [ Rule.error
+                { message = "Record has only one field"
+                , details = [ "You should use the field's type or introduce a custom Type." ]
+                }
+                (Node.range typeAnnotation)
+            ]
+
+        TypeAnnotation.GenericRecord _ (Node _ [ _ ]) ->
             [ Rule.error
                 { message = "Record has only one field"
                 , details = [ "You should use the field's type or introduce a custom Type." ]
