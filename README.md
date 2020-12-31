@@ -1,11 +1,11 @@
 # elm-review-rules-to-avoid
 
-Provides [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/) rules to REPLACEME.
+Provides some elm-analyse rules for [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/) that we don't want to publish. These are written as an exercise to confirm they're possible.
 
 
 ## Provided rules
 
-- [`NoSingleFieldRecord`](https://package.elm-lang.org/packages/sparksp/elm-review-rules-to-avoid/1.0.0/NoSingleFieldRecord) - Reports REPLACEME.
+- [`NoSingleFieldRecord`](https://package.elm-lang.org/packages/sparksp/elm-review-rules-to-avoid/1.0.0/NoSingleFieldRecord) - Reports records containing a single field.
 
 
 ## Configuration
