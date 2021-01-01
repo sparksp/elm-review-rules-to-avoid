@@ -22,6 +22,12 @@ type alias Person =
                             , details = [ "Records in type aliases should be formatted on multiple lines to help the reader." ]
                             , under = "{ name : String, age : Int, address : Address }"
                             }
+                            |> Review.Test.whenFixed
+                                (String.replace "}" "\n}" """
+module A exposing (Person)
+type alias Person =
+    { name : String, age : Int, address : Address }
+""")
                         ]
         , test "should not report an error when a record is split over multiple lines" <|
             \() ->

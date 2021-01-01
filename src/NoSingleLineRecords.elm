@@ -8,8 +8,9 @@ module NoSingleLineRecords exposing (rule)
 
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Node as Node exposing (Node(..))
-import Elm.Syntax.Range exposing (Range)
+import Elm.Syntax.Range as Range exposing (Range)
 import Elm.Syntax.TypeAnnotation as TypeAnnotation exposing (TypeAnnotation)
+import Review.Fix as Fix exposing (Fix)
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -68,19 +69,35 @@ declarationVisitor declaration =
 
 aliasDeclarationVisitor : Node TypeAnnotation -> List (Rule.Error {})
 aliasDeclarationVisitor (Node range typeAnnotation) =
-    case ( typeAnnotation, rangeLines range ) of
+    case ( typeAnnotation, linesInRange range ) of
         ( TypeAnnotation.Record _, 1 ) ->
-            [ Rule.error
+            [ Rule.errorWithFix
                 { message = "Record not formatted over multiple lines"
                 , details = [ "Records in type aliases should be formatted on multiple lines to help the reader." ]
                 }
                 range
+                [ insertNewLineBefore range.end ]
             ]
 
         _ ->
             []
 
 
-rangeLines : Range -> Int
-rangeLines { start, end } =
+insertNewLineBefore : Range.Location -> Fix
+insertNewLineBefore location =
+    Fix.insertAt (columnBefore location) "\n"
+
+
+linesInRange : Range -> Int
+linesInRange { start, end } =
     start.row - end.row + 1
+
+
+columnBefore : Range.Location -> Range.Location
+columnBefore =
+    mapColumn (\x -> x - 1)
+
+
+mapColumn : (Int -> Int) -> Range.Location -> Range.Location
+mapColumn mapper location =
+    { location | column = mapper location.column }
