@@ -23,4 +23,26 @@ type alias Person =
                             , under = "{ name : String, age : Int, address : Address }"
                             }
                         ]
+        , test "should not report an error when a record is split over multiple lines" <|
+            \() ->
+                """
+module A exposing (Person)
+type alias Person =
+    { name : String
+    , age : Int
+    , address : Address
+    }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
+        , test "should not report an error when a single field record is split over multiple lines" <|
+            \() ->
+                """
+module A exposing (Person)
+type alias Person =
+    { name : String
+    }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         ]
