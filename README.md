@@ -6,6 +6,7 @@ Provides some elm-analyse rules for [`elm-review`](https://package.elm-lang.org/
 ## Provided rules
 
 - [`NoSingleFieldRecord`](https://elm-doc-preview.netlify.app/NoSingleFieldRecord?repo=sparksp/elm-review-rules-to-avoid) - Reports records containing a single field.
+- [`NoSingleLineRecords`](https://elm-doc-preview.netlify.app/NoSingleLineRecords?repo=sparksp/elm-review-rules-to-avoid) - Reports record type aliases declared on a single line.
 
 
 ## Configuration
@@ -14,11 +15,13 @@ Provides some elm-analyse rules for [`elm-review`](https://package.elm-lang.org/
 module ReviewConfig exposing (config)
 
 import NoSingleFieldRecord
+import NoSingleLineRecords
 import Review.Rule exposing (Rule)
 
 config : List Rule
 config =
     [ NoSingleFieldRecord.rule
+    , NoSingleLineRecords.rule
     ]
 ```
 
