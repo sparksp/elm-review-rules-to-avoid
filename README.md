@@ -1,6 +1,6 @@
 # elm-review-rules-to-avoid
 
-Provides some elm-analyse rules for [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/) that we don't want to publish. These are written as an exercise to confirm they're possible.
+Provides some elm-analyse rules for [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/) that we don't want to publish. These are written to demonstrate that just because you can write a rule doesn't mean you should!
 
 
 ## Provided rules
