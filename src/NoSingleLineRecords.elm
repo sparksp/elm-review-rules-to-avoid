@@ -71,16 +71,23 @@ aliasDeclarationVisitor : Node TypeAnnotation -> List (Rule.Error {})
 aliasDeclarationVisitor (Node range typeAnnotation) =
     case ( typeAnnotation, linesInRange range ) of
         ( TypeAnnotation.Record _, 1 ) ->
-            [ Rule.errorWithFix
-                { message = "Record not formatted over multiple lines"
-                , details = [ "Records in type aliases should be formatted on multiple lines to help the reader." ]
-                }
-                range
-                [ insertNewLineBefore range.end ]
-            ]
+            [ singleLineRecordError range ]
+
+        ( TypeAnnotation.GenericRecord _ _, 1 ) ->
+            [ singleLineRecordError range ]
 
         _ ->
             []
+
+
+singleLineRecordError : Range -> Rule.Error {}
+singleLineRecordError range =
+    Rule.errorWithFix
+        { message = "Record not formatted over multiple lines"
+        , details = [ "Records in type aliases should be formatted on multiple lines to help the reader." ]
+        }
+        range
+        [ insertNewLineBefore range.end ]
 
 
 insertNewLineBefore : Range.Location -> Fix
