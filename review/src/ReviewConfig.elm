@@ -38,7 +38,10 @@ config =
     , NoDebug.TodoOrToString.rule
         |> Rule.ignoreErrorsForDirectories [ "tests/" ]
     , NoExposingEverything.rule
-    , NoForbiddenWords.rule [ "REPLACEME" ]
+    , NoForbiddenWords.rule
+        [ "REPLACEME"
+        , "sparksp/elm-review-rules-to-avoid/example"
+        ]
     , NoImportingEverything.rule []
     , NoMissingTypeAnnotation.rule
     , NoMissingTypeAnnotationInLetIn.rule

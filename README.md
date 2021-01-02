@@ -28,5 +28,5 @@ config =
 You can try the example configuration above out by running the following command:
 
 ```bash
-elm-review --template sparksp/elm-review-rules-to-avoid/example
+elm-review --template sparksp/elm-review-rules-to-avoid/preview
 ```

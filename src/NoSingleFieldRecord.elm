@@ -57,7 +57,7 @@ Using a record is obsolete if you only plan to store a single field in it. Howev
 You can try this rule out by running the following command:
 
 ```bash
-elm-review --template sparksp/elm-review-rules-to-avoid/example --rules NoSingleFieldRecord
+elm-review --template sparksp/elm-review-rules-to-avoid/preview --rules NoSingleFieldRecord
 ```
 
 -}
