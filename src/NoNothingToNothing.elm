@@ -77,7 +77,7 @@ expressionVisitor expression =
 caseVisitor : ( Node Pattern, Node Expression ) -> List (Rule.Error {}) -> List (Rule.Error {})
 caseVisitor ( pattern, expression ) errors =
     case ( Node.value pattern, Node.value expression ) of
-        ( Pattern.NamedPattern { name } _, _ ) ->
+        ( Pattern.NamedPattern { name } _, Expression.FunctionOrValue [] "Nothing" ) ->
             case name of
                 "Nothing" ->
                     Rule.error

@@ -30,4 +30,19 @@ greet maybeName =
                             }
                             |> Review.Test.atExactly { start = { row = 6, column = 9 }, end = { row = 6, column = 16 } }
                         ]
+        , test "should not report an error when a case matches Nothing and returns Just" <|
+            \() ->
+                """module Greet exposing (greet)
+
+greet : Maybe String -> Maybe String
+greet maybeName =
+    case maybeName of
+        Nothing ->
+            Just "Hello"
+
+        Just name ->
+            Just ("Hello " ++ name)
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         ]
