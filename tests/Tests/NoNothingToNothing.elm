@@ -30,6 +30,28 @@ greet maybeName =
                             }
                             |> Review.Test.atExactly { start = { row = 6, column = 9 }, end = { row = 6, column = 16 } }
                         ]
+        , test "should report an error when a case matches and returns Maybe.Nothing" <|
+            \() ->
+                """module Greet exposing (greet)
+
+greet : Maybe String -> Maybe String
+greet maybeName =
+    case maybeName of
+        Maybe.Nothing ->
+            Maybe.Nothing
+
+        Maybe.Just name ->
+            Maybe.Just ("Hello " ++ name)
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "`Nothing` mapped to `Nothing` in case expression"
+                            , details = [ "Do not map a `Nothing` to `Nothing` with a case expression. Use `Maybe.andThen` or `Maybe.map` instead." ]
+                            , under = "Maybe.Nothing"
+                            }
+                            |> Review.Test.atExactly { start = { row = 6, column = 9 }, end = { row = 6, column = 22 } }
+                        ]
         , test "should not report an error when a case matches Nothing and returns Just" <|
             \() ->
                 """module Greet exposing (greet)

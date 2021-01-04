@@ -102,6 +102,9 @@ parseNothingPattern pattern =
                 ( [], "Nothing" ) ->
                     IsNothing
 
+                ( [ "Maybe" ], "Nothing" ) ->
+                    IsNothing
+
                 _ ->
                     NotNothing
 
@@ -113,6 +116,9 @@ parseNothingExpression : Node Expression -> IsNothing
 parseNothingExpression expression =
     case Node.value expression of
         Expression.FunctionOrValue [] "Nothing" ->
+            IsNothing
+
+        Expression.FunctionOrValue [ "Maybe" ] "Nothing" ->
             IsNothing
 
         _ ->
