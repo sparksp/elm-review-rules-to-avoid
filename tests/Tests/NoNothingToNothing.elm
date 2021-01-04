@@ -45,4 +45,19 @@ greet maybeName =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should not report an error when a case matches Nothing and returns a String" <|
+            \() ->
+                """module Greet exposing (greet)
+
+greet : Maybe String -> String
+greet maybeName =
+    case maybeName of
+        Nothing ->
+            "Nothing"
+
+        Just name ->
+            "Just " ++ name
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         ]
