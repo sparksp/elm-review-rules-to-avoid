@@ -5,6 +5,7 @@ Provides some elm-analyse rules for [`elm-review`](https://package.elm-lang.org/
 
 ## Provided rules
 
+- [`NoNothingToNothing`](https://elm-doc-preview.netlify.app/NoNothingToNothing?repo=sparksp/elm-review-rules-to-avoid) - Reports case expressions matching and returning `Nothing`.
 - [`NoSingleFieldRecord`](https://elm-doc-preview.netlify.app/NoSingleFieldRecord?repo=sparksp/elm-review-rules-to-avoid) - Reports records containing a single field.
 - [`NoSingleLineRecords`](https://elm-doc-preview.netlify.app/NoSingleLineRecords?repo=sparksp/elm-review-rules-to-avoid) - Reports record type aliases declared on a single line.
 
@@ -14,13 +15,15 @@ Provides some elm-analyse rules for [`elm-review`](https://package.elm-lang.org/
 ```elm
 module ReviewConfig exposing (config)
 
+import NoNothingToNothing
 import NoSingleFieldRecord
 import NoSingleLineRecords
 import Review.Rule exposing (Rule)
 
 config : List Rule
 config =
-    [ NoSingleFieldRecord.rule
+    [ NoNothingToNothing.rule
+    , NoSingleFieldRecord.rule
     , NoSingleLineRecords.rule
     ]
 ```
