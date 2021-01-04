@@ -76,19 +76,44 @@ expressionVisitor expression =
 
 caseVisitor : ( Node Pattern, Node Expression ) -> List (Rule.Error {}) -> List (Rule.Error {})
 caseVisitor ( pattern, expression ) errors =
-    case ( Node.value pattern, Node.value expression ) of
-        ( Pattern.NamedPattern { name } _, Expression.FunctionOrValue [] "Nothing" ) ->
-            case name of
-                "Nothing" ->
-                    Rule.error
-                        { message = "`Nothing` mapped to `Nothing` in case expression"
-                        , details = [ "Do not map a `Nothing` to `Nothing` with a case expression. Use `Maybe.andThen` or `Maybe.map` instead." ]
-                        }
-                        (Node.range pattern)
-                        :: errors
-
-                _ ->
-                    errors
+    case ( parseNothingPattern pattern, parseNothingExpression expression ) of
+        ( IsNothing, IsNothing ) ->
+            Rule.error
+                { message = "`Nothing` mapped to `Nothing` in case expression"
+                , details = [ "Do not map a `Nothing` to `Nothing` with a case expression. Use `Maybe.andThen` or `Maybe.map` instead." ]
+                }
+                (Node.range pattern)
+                :: errors
 
         _ ->
             errors
+
+
+type IsNothing
+    = IsNothing
+    | NotNothing
+
+
+parseNothingPattern : Node Pattern -> IsNothing
+parseNothingPattern pattern =
+    case Node.value pattern of
+        Pattern.NamedPattern { moduleName, name } _ ->
+            case ( moduleName, name ) of
+                ( [], "Nothing" ) ->
+                    IsNothing
+
+                _ ->
+                    NotNothing
+
+        _ ->
+            NotNothing
+
+
+parseNothingExpression : Node Expression -> IsNothing
+parseNothingExpression expression =
+    case Node.value expression of
+        Expression.FunctionOrValue [] "Nothing" ->
+            IsNothing
+
+        _ ->
+            NotNothing
