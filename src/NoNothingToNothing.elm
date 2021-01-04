@@ -9,6 +9,7 @@ module NoNothingToNothing exposing (rule)
 import Elm.Syntax.Expression as Expression exposing (Expression)
 import Elm.Syntax.Node as Node exposing (Node)
 import Elm.Syntax.Pattern as Pattern exposing (Pattern)
+import Review.ModuleNameLookupTable as ModuleNameLookupTable exposing (ModuleNameLookupTable)
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -59,24 +60,35 @@ elm-review --template sparksp/elm-review-rules-to-avoid/preview --rules NoNothin
 -}
 rule : Rule
 rule =
-    Rule.newModuleRuleSchema "NoNothingToNothing" ()
-        |> Rule.withSimpleExpressionVisitor expressionVisitor
+    Rule.newModuleRuleSchemaUsingContextCreator "NoNothingToNothing" contextCreator
+        |> Rule.withExpressionEnterVisitor expressionVisitor
         |> Rule.fromModuleRuleSchema
 
 
-expressionVisitor : Node Expression -> List (Rule.Error {})
-expressionVisitor expression =
+type Context
+    = Context ModuleNameLookupTable ()
+
+
+contextCreator : Rule.ContextCreator () Context
+contextCreator =
+    Rule.initContextCreator
+        Context
+        |> Rule.withModuleNameLookupTable
+
+
+expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
+expressionVisitor expression ((Context lookupTable ()) as context) =
     case Node.value expression of
         Expression.CaseExpression { cases } ->
-            List.foldr caseVisitor [] cases
+            ( List.foldr (caseVisitor lookupTable) [] cases, context )
 
         _ ->
-            []
+            ( [], context )
 
 
-caseVisitor : ( Node Pattern, Node Expression ) -> List (Rule.Error {}) -> List (Rule.Error {})
-caseVisitor ( pattern, expression ) errors =
-    case ( parseNothingPattern pattern, parseNothingExpression expression ) of
+caseVisitor : ModuleNameLookupTable -> ( Node Pattern, Node Expression ) -> List (Rule.Error {}) -> List (Rule.Error {})
+caseVisitor lookupTable ( pattern, expression ) errors =
+    case ( parseNothingPattern lookupTable pattern, parseNothingExpression lookupTable expression ) of
         ( IsNothing, IsNothing ) ->
             Rule.error
                 { message = "`Nothing` mapped to `Nothing` in case expression"
@@ -94,15 +106,12 @@ type IsNothing
     | NotNothing
 
 
-parseNothingPattern : Node Pattern -> IsNothing
-parseNothingPattern pattern =
+parseNothingPattern : ModuleNameLookupTable -> Node Pattern -> IsNothing
+parseNothingPattern lookupTable pattern =
     case Node.value pattern of
-        Pattern.NamedPattern { moduleName, name } _ ->
-            case ( moduleName, name ) of
-                ( [], "Nothing" ) ->
-                    IsNothing
-
-                ( [ "Maybe" ], "Nothing" ) ->
+        Pattern.NamedPattern { name } _ ->
+            case ( ModuleNameLookupTable.moduleNameFor lookupTable pattern, name ) of
+                ( Just [ "Maybe" ], "Nothing" ) ->
                     IsNothing
 
                 _ ->
@@ -112,14 +121,16 @@ parseNothingPattern pattern =
             NotNothing
 
 
-parseNothingExpression : Node Expression -> IsNothing
-parseNothingExpression expression =
+parseNothingExpression : ModuleNameLookupTable -> Node Expression -> IsNothing
+parseNothingExpression lookupTable expression =
     case Node.value expression of
-        Expression.FunctionOrValue [] "Nothing" ->
-            IsNothing
+        Expression.FunctionOrValue _ "Nothing" ->
+            case ModuleNameLookupTable.moduleNameFor lookupTable expression of
+                Just [ "Maybe" ] ->
+                    IsNothing
 
-        Expression.FunctionOrValue [ "Maybe" ] "Nothing" ->
-            IsNothing
+                _ ->
+                    NotNothing
 
         _ ->
             NotNothing
