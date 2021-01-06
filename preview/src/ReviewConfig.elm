@@ -11,6 +11,7 @@ when inside the directory containing this file.
 
 -}
 
+import NoFunctionInLet
 import NoNothingToNothing
 import NoSingleFieldRecord
 import NoSingleLineRecords
@@ -19,7 +20,8 @@ import Review.Rule exposing (Rule)
 
 config : List Rule
 config =
-    [ NoSingleFieldRecord.rule
+    [ NoFunctionInLet.rule
     , NoNothingToNothing.rule
+    , NoSingleFieldRecord.rule
     , NoSingleLineRecords.rule
     ]
