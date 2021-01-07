@@ -130,6 +130,9 @@ errorsForTypeAnnotation typeAnnotation =
         TypeAnnotation.GenericRecord _ (Node _ records) ->
             fastConcatMap errorsForRecordField records
 
+        TypeAnnotation.Tupled fields ->
+            fastConcatMap errorsForTypeAnnotation fields
+
         TypeAnnotation.FunctionTypeAnnotation left right ->
             errorsForTypeAnnotation left
                 ++ errorsForTypeAnnotation right

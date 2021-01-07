@@ -213,6 +213,47 @@ type alias Foo =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should report single field records in tuples" <|
+            \() ->
+                """
+module A exposing (..)
+type alias Foo =
+    ( { x : Int }
+    , { y : Int }
+    )
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ singleFieldRecordErrorUnder "{ x : Int }"
+                        , singleFieldRecordErrorUnder "{ y : Int }"
+                        ]
+        , test "should report single field records in 3-ples" <|
+            \() ->
+                """
+module A exposing (..)
+type alias Foo =
+    ( { x : Int }
+    , { y : Int }
+    , { z : Int }
+    )
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ singleFieldRecordErrorUnder "{ x : Int }"
+                        , singleFieldRecordErrorUnder "{ y : Int }"
+                        , singleFieldRecordErrorUnder "{ z : Int }"
+                        ]
+        , test "should not report multiple field records in tuples" <|
+            \() ->
+                """
+module A exposing (..)
+type alias Foo =
+    ( { x : Int, y : Int }
+    , { x : Int, y : Int }
+    )
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         ]
 
 
