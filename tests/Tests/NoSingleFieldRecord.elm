@@ -112,6 +112,46 @@ multipleFieldRecord { foo } =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should report a single field record in a custom type" <|
+            \() ->
+                """
+module A exposing (..)
+type Foo
+    = Foo { bar : String }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ singleFieldRecordErrorUnder "{ bar : String }"
+                        ]
+        , test "should report a single field generic record in a custom type" <|
+            \() ->
+                """
+module A exposing (..)
+type Foo a
+    = Foo { a | bar : String }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ singleFieldRecordErrorUnder "{ a | bar : String }"
+                        ]
+        , test "does not report a records in custom types with more than 1 field" <|
+            \() ->
+                """
+module A exposing (..)
+type Foo
+    = Foo { bish : String, bosh : Int }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
+        , test "does not report generic records in a custom types with more than 1 field" <|
+            \() ->
+                """
+module A exposing (..)
+type Foo a
+    = Foo { a | bish : String, bosh : Int }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         ]
 
 

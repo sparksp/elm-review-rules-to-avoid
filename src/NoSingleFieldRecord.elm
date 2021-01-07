@@ -9,6 +9,7 @@ module NoSingleFieldRecord exposing (rule)
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Signature exposing (Signature)
+import Elm.Syntax.Type as Type
 import Elm.Syntax.TypeAnnotation as TypeAnnotation exposing (TypeAnnotation)
 import Review.Rule as Rule exposing (Rule)
 
@@ -77,8 +78,21 @@ declarationVisitor node =
         Declaration.FunctionDeclaration { signature } ->
             errorsForFunctionSignature signature
 
+        Declaration.CustomTypeDeclaration { constructors } ->
+            errorsForValueConstructorList constructors
+
         _ ->
             []
+
+
+errorsForValueConstructorList : List (Node Type.ValueConstructor) -> List (Rule.Error {})
+errorsForValueConstructorList constructors =
+    fastConcatMap errorsForValueConstructor constructors
+
+
+errorsForValueConstructor : Node Type.ValueConstructor -> List (Rule.Error {})
+errorsForValueConstructor (Node _ { arguments }) =
+    fastConcatMap errorsForTypeAnnotation arguments
 
 
 errorsForFunctionSignature : Maybe (Node Signature) -> List (Rule.Error {})
@@ -87,7 +101,7 @@ errorsForFunctionSignature signature =
         Just (Node _ { typeAnnotation }) ->
             errorsForTypeAnnotation typeAnnotation
 
-        _ ->
+        Nothing ->
             []
 
 
@@ -116,3 +130,12 @@ errorsForTypeAnnotation typeAnnotation =
 
         _ ->
             []
+
+
+
+--- High Performance List
+
+
+fastConcatMap : (a -> List b) -> List a -> List b
+fastConcatMap fn =
+    List.foldr (fn >> (++)) []
