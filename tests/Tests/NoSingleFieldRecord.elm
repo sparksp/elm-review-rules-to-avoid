@@ -16,11 +16,7 @@ type alias SingleFieldRecord = { foo : String }
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
-                        [ Review.Test.error
-                            { message = "Record has only one field"
-                            , details = [ "You should use the field's type or introduce a custom Type." ]
-                            , under = "{ foo : String }"
-                            }
+                        [ singleFieldRecordErrorUnder "{ foo : String }"
                         ]
         , test "does not report type alias records with more than one field" <|
             \() ->
@@ -38,11 +34,7 @@ type alias SingleFieldRecord = { r | foo : String }
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
-                        [ Review.Test.error
-                            { message = "Record has only one field"
-                            , details = [ "You should use the field's type or introduce a custom Type." ]
-                            , under = "{ r | foo : String }"
-                            }
+                        [ singleFieldRecordErrorUnder "{ r | foo : String }"
                         ]
         , test "does not report type alias generic records with more than one field" <|
             \() ->
@@ -62,11 +54,7 @@ singleFieldRecord { foo } =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
-                        [ Review.Test.error
-                            { message = "Record has only one field"
-                            , details = [ "You should use the field's type or introduce a custom Type." ]
-                            , under = "{ foo : String }"
-                            }
+                        [ singleFieldRecordErrorUnder "{ foo : String }"
                         ]
         , test "should report an argument generic record containing only 1 field" <|
             \() ->
@@ -78,11 +66,7 @@ singleFieldRecord { foo } =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
-                        [ Review.Test.error
-                            { message = "Record has only one field"
-                            , details = [ "You should use the field's type or introduce a custom Type." ]
-                            , under = "{ r | foo : String }"
-                            }
+                        [ singleFieldRecordErrorUnder "{ r | foo : String }"
                         ]
         , test "should report a function returning a single field record" <|
             \() ->
@@ -94,11 +78,7 @@ singleFieldRecord foo =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
-                        [ Review.Test.error
-                            { message = "Record has only one field"
-                            , details = [ "You should use the field's type or introduce a custom Type." ]
-                            , under = "{ foo : String }"
-                            }
+                        [ singleFieldRecordErrorUnder "{ foo : String }"
                         ]
         , test "should report a function returning a single field generic record" <|
             \() ->
@@ -110,11 +90,7 @@ singleFieldRecord foo =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
-                        [ Review.Test.error
-                            { message = "Record has only one field"
-                            , details = [ "You should use the field's type or introduce a custom Type." ]
-                            , under = "{ r | foo : String }"
-                            }
+                        [ singleFieldRecordErrorUnder "{ r | foo : String }"
                         ]
         , test "does not report argument records containing more than 1 field" <|
             \() ->
@@ -137,3 +113,12 @@ multipleFieldRecord { foo } =
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
         ]
+
+
+singleFieldRecordErrorUnder : String -> Review.Test.ExpectedError
+singleFieldRecordErrorUnder under =
+    Review.Test.error
+        { message = "Record has only one field"
+        , details = [ "You should use the field's type or introduce a custom Type." ]
+        , under = under
+        }
