@@ -116,6 +116,9 @@ errorsForTypeAnnotation typeAnnotation =
                 (Node.range typeAnnotation)
             ]
 
+        TypeAnnotation.Record records ->
+            fastConcatMap errorsForRecordField records
+
         TypeAnnotation.GenericRecord _ (Node _ [ _ ]) ->
             [ Rule.error
                 { message = "Record has only one field"
@@ -124,12 +127,20 @@ errorsForTypeAnnotation typeAnnotation =
                 (Node.range typeAnnotation)
             ]
 
+        TypeAnnotation.GenericRecord _ (Node _ records) ->
+            fastConcatMap errorsForRecordField records
+
         TypeAnnotation.FunctionTypeAnnotation left right ->
             errorsForTypeAnnotation left
                 ++ errorsForTypeAnnotation right
 
         _ ->
             []
+
+
+errorsForRecordField : Node TypeAnnotation.RecordField -> List (Rule.Error {})
+errorsForRecordField (Node _ ( _, record )) =
+    errorsForTypeAnnotation record
 
 
 

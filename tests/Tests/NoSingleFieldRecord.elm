@@ -152,6 +152,67 @@ type Foo a
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should report a single field record in other records" <|
+            \() ->
+                """
+module A exposing (..)
+type alias Foo =
+    { a : { bish : String }
+    , b : String
+    }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ singleFieldRecordErrorUnder "{ bish : String }"
+                        ]
+        , test "should only report the outer most single field record" <|
+            \() ->
+                """
+module A exposing (..)
+type alias Foo =
+    { a : { bish : String } }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ singleFieldRecordErrorUnder "{ a : { bish : String } }"
+                        ]
+        , test "should report a single field record in generic records" <|
+            \() ->
+                """
+module A exposing (..)
+type alias Foo =
+    { a
+        | foo : { bish : String }
+        , bar : String
+    }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ singleFieldRecordErrorUnder "{ bish : String }"
+                        ]
+        , test "does not report records with more than 1 field in other records" <|
+            \() ->
+                """
+module A exposing (..)
+type alias Foo =
+    { a : { bish : String, bosh : Int }
+    , b : String
+    }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
+        , test "does not report records with more than 1 field in generic records" <|
+            \() ->
+                """
+module A exposing (..)
+type alias Foo =
+    { a
+        | foo : { bish : String, bosh : Int }
+        , bar : String
+    }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         ]
 
 
