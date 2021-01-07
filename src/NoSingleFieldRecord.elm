@@ -137,7 +137,13 @@ errorsForTypeAnnotation typeAnnotation =
             errorsForTypeAnnotation left
                 ++ errorsForTypeAnnotation right
 
-        _ ->
+        TypeAnnotation.Typed _ fields ->
+            fastConcatMap errorsForTypeAnnotation fields
+
+        TypeAnnotation.GenericType _ ->
+            []
+
+        TypeAnnotation.Unit ->
             []
 
 

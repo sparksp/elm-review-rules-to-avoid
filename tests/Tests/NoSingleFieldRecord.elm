@@ -254,6 +254,26 @@ type alias Foo =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should report typed single field records" <|
+            \() ->
+                """
+module A exposing (..)
+type alias Foo =
+    Maybe { name : String }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ singleFieldRecordErrorUnder "{ name : String }"
+                        ]
+        , test "should not report typed multiple field records" <|
+            \() ->
+                """
+module A exposing (..)
+type alias Foo =
+    Maybe { name : String, age : Int }
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         ]
 
 
