@@ -16,13 +16,28 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
 
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v2
+      - uses: actions/cache@v2.1.5
+        id: yarn-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-node_modules
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile
+      - uses: actions/cache@v2.1.5
+        with:
+          path: ~/.elm
+          key: ${{ runner.os }}-elm--home-${{ hashFiles('**/elm.json') }}
 
-    - name: Run tests
-      run: yarn test
+      - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        env:
+          NO_ELM_TOOLING_INSTALL: 1
+        run: yarn install --frozen-lockfile
+
+      - name: Install elm tooling
+        run: npx --no-install elm-tooling install
+
+      - name: Run tests
+        run: yarn test
