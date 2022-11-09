@@ -54,6 +54,7 @@ rule : Rule
 rule =
     Rule.newModuleRuleSchema "NoSingleLineRecords" ()
         |> Rule.withSimpleDeclarationVisitor declarationVisitor
+        |> Rule.providesFixesForModuleRule
         |> Rule.fromModuleRuleSchema
 
 
