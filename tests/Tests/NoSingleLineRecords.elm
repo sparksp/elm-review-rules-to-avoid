@@ -23,7 +23,7 @@ type alias Person =
                             , under = "{ name : String, age : Int, address : Address }"
                             }
                             |> Review.Test.whenFixed
-                                (String.replace "}" "\n}" """
+                                (String.replace "}" "\n }" """
 module A exposing (Person)
 type alias Person =
     { name : String, age : Int, address : Address }
@@ -66,7 +66,7 @@ type alias Person p =
                             , under = "{ p | name : String, age : Int, address : Address }"
                             }
                             |> Review.Test.whenFixed
-                                (String.replace "}" "\n}" """
+                                (String.replace "}" "\n }" """
 module A exposing (Person)
 type alias Person p =
     { p | name : String, age : Int, address : Address }

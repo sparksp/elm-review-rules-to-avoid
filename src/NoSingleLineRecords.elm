@@ -93,7 +93,7 @@ singleLineRecordError range =
 
 insertNewLineBefore : Range.Location -> Fix
 insertNewLineBefore location =
-    Fix.insertAt (columnBefore location) "\n"
+    Fix.insertAt (columnBefore location) "\n "
 
 
 linesInRange : Range -> Int
